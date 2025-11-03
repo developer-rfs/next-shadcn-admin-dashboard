@@ -1,9 +1,9 @@
 export const users = [
   {
     id: "1",
-    name: "Arham Khan",
+    name: "Hamza Mughal",
     username: "Aarhamkhnz",
-    email: "hello@arhamkhnz.com",
+    email: "hamza@mughal.com",
     avatar: "/avatars/arhamkhnz.png",
     role: "administrator",
   },

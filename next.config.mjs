@@ -4,15 +4,18 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
+  images: {
+    domains: ["ddf-backend-static.s3.amazonaws.com"],
+  },
   async redirects() {
     return [
       {
         source: "/dashboard",
-        destination: "/dashboard/default",
+        destination: "/dashboard/tournaments",
         permanent: false,
       },
     ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
