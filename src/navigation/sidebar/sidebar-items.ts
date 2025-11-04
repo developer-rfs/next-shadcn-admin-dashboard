@@ -1,4 +1,4 @@
-import { Trophy, type LucideIcon } from "lucide-react";
+import { Home, Trophy, Users, type LucideIcon } from "lucide-react";
 
 export interface NavSubItem {
   title: string;
@@ -30,9 +30,19 @@ export const sidebarItems: NavGroup[] = [
     id: 1,
     items: [
       {
-        title: "Tournaments",
+        title: "Dashboard",
+        url: "/dashboard/dashboard",
+        icon: Home,
+      },
+      {
+        title: "Tournament",
         url: "/dashboard/tournaments",
         icon: Trophy,
+      },
+      {
+        title: "Teams",
+        url: "/dashboard/teams",
+        icon: Users,
       },
     ],
   },

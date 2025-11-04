@@ -72,7 +72,7 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <FormField
+        {/* <FormField
           control={form.control}
           name="remember"
           render={({ field }) => (
@@ -90,8 +90,8 @@ export function LoginForm() {
               </FormLabel>
             </FormItem>
           )}
-        />
-        <Button className="w-full" type="submit">
+        /> */}
+        <Button className="w-full bg-slate-900 text-white hover:bg-slate-800" type="submit">
           Login
         </Button>
       </form>

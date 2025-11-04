@@ -31,12 +31,8 @@ export function RegisterForm() {
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    toast.success("Account created (demo)", {
+      description: `Registered ${data.email}. You can now sign in.`,
     });
   };
 
@@ -63,7 +59,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input id="password" type="password" placeholder="••••••••" autoComplete="new-password" {...field} />
+                <Input id="password" type="password" placeholder="********" autoComplete="new-password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -79,7 +75,7 @@ export function RegisterForm() {
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="********"
                   autoComplete="new-password"
                   {...field}
                 />
@@ -88,7 +84,7 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-        <Button className="w-full" type="submit">
+        <Button className="w-full bg-slate-900 text-white hover:bg-slate-800" type="submit">
           Register
         </Button>
       </form>
