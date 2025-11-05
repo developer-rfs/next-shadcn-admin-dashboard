@@ -139,7 +139,7 @@ function CreateTournamentForm({ form, teeOptions, onSubmit }: CreateTournamentFo
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-1">
           <FormField
             control={form.control}
             name="startDate"
@@ -243,7 +243,7 @@ function CreateTournamentForm({ form, teeOptions, onSubmit }: CreateTournamentFo
                   +
                 </Button>
               </div>
-              <p className="text-muted-foreground text-xs">Max 12 team member</p>
+              <p className="text-muted-foreground text-xs">Max 12 team members</p>
               <FormMessage />
             </FormItem>
           )}
