@@ -1,9 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -13,13 +16,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api-client";
 import { login } from "@/services/auth";
-import { Eye, EyeOff } from "lucide-react";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
   remember: z.boolean().optional(),
 });
+
+const inputStyles =
+  "h-12 rounded-none border-slate-900/50 shadow-none focus-visible:border-slate-900 focus-visible:ring-0";
 
 export function LoginForm() {
   const router = useRouter();
@@ -78,15 +83,22 @@ export function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...field} />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email or username"
+                  autoComplete="email"
+                  className={inputStyles}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -103,13 +115,14 @@ export function LoginForm() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="********"
+                    placeholder="Enter your password"
                     autoComplete="current-password"
+                    className={inputStyles}
                     {...field}
                   />
                   <button
                     type="button"
-                    className="text-muted-foreground hover:text-slate-900 absolute inset-y-0 right-0 flex items-center pr-3"
+                    className="text-muted-foreground absolute inset-y-0 right-0 flex items-center pr-3 hover:text-slate-900"
                     onClick={() => setShowPassword((prev) => !prev)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
@@ -121,8 +134,13 @@ export function LoginForm() {
             </FormItem>
           )}
         />
+        <div className="flex justify-end">
+          <Link href="/forgot-password" className="text-xs font-medium text-slate-900 hover:underline">
+            Forgot Password?
+          </Link>
+        </div>
         <Button
-          className="w-full bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-70"
+          className="w-full bg-[#D9D9D9] text-slate-900 hover:bg-[#c5c5c5] focus-visible:ring-0 disabled:opacity-70"
           type="submit"
           disabled={isSubmitting}
         >

@@ -164,3 +164,12 @@ These serve as the fallback; there is no separate default.css file. */
 .disable-transitions * {
   transition: none !important;
 }
+
+[data-sonner-toaster] [data-description] {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+.dark [data-sonner-toaster] [data-description] {
+  color: #e2e8f0 !important;
+}

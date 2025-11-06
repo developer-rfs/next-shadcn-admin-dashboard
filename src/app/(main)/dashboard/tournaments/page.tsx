@@ -4,8 +4,17 @@ import { useMemo, useState } from "react";
 
 import Image from "next/image";
 
-import { Copy, PencilLine, Users2, UserRound } from "lucide-react";
-import { toast } from "sonner";
+import {
+  CalendarDays,
+  Clock,
+  DollarSign,
+  Filter,
+  HeartHandshake,
+  MapPin,
+  Trophy,
+  Users,
+  Users2,
+} from "lucide-react";
 
 import { usePageHeaderConfig } from "@/app/(main)/dashboard/_components/page-header";
 import {
@@ -14,199 +23,386 @@ import {
 } from "@/components/tournaments/create-tournament-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-type TournamentRow = {
+type TournamentStatus = "upcoming" | "active" | "completed";
+
+type TournamentCardData = {
   id: string;
+  name: string;
+  status: TournamentStatus;
   startDate: string;
-  teamCount: number;
-  playerCount: number;
+  time: string;
+  playersPerTeam: number;
+  registrationCost: string;
+  venue: string;
+  charity: string;
+  image: string;
+  totalPlayers: number;
+  totalDonations: number;
 };
 
-const highlightTournament = {
-  name: "Florida Golf Club",
-  image: "/img1.png",
-  date: "25 Nov, 2025",
-  time: "10:00 AM",
-  difficulty: "30",
-  shareLink: "https://example.com/tournaments/florida-golf-club",
-};
+const TOURNAMENT_IMAGE = "/img1.png";
 
-const initialActiveRows: TournamentRow[] = [
-  { id: "1", startDate: "2025-11-25", teamCount: 24, playerCount: 96 },
-  { id: "2", startDate: "2025-11-25", teamCount: 36, playerCount: 120 },
-  { id: "3", startDate: "2025-11-25", teamCount: 18, playerCount: 72 },
-  { id: "4", startDate: "2025-11-25", teamCount: 20, playerCount: 80 },
-  { id: "5", startDate: "2025-11-25", teamCount: 28, playerCount: 72 },
-  { id: "6", startDate: "2025-11-25", teamCount: 32, playerCount: 48 },
-  { id: "7", startDate: "2025-11-25", teamCount: 36, playerCount: 96 },
+const initialTournaments: TournamentCardData[] = [
+  {
+    id: "1",
+    name: "Florida Golf Club",
+    status: "upcoming",
+    startDate: "2025-11-25T10:00:00-05:00",
+    time: "10:00 AM (EST)",
+    playersPerTeam: 4,
+    registrationCost: "$30",
+    venue: "Sugar Land, Texas",
+    charity: "Fort Ben Foundation",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 120,
+    totalDonations: 12350,
+  },
+  {
+    id: "2",
+    name: "Desert Classic",
+    status: "upcoming",
+    startDate: "2025-12-05T09:30:00-07:00",
+    time: "9:30 AM (MST)",
+    playersPerTeam: 4,
+    registrationCost: "$45",
+    venue: "Scottsdale, Arizona",
+    charity: "Play It Forward",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 96,
+    totalDonations: 9800,
+  },
+  {
+    id: "3",
+    name: "Coastal Invitational",
+    status: "active",
+    startDate: "2025-11-02T08:45:00-05:00",
+    time: "8:45 AM (EST)",
+    playersPerTeam: 3,
+    registrationCost: "$25",
+    venue: "Hilton Head, South Carolina",
+    charity: "Coastal Care Fund",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 72,
+    totalDonations: 7650,
+  },
+  {
+    id: "4",
+    name: "Cedar Pines Cup",
+    status: "active",
+    startDate: "2025-11-10T11:00:00-06:00",
+    time: "11:00 AM (CST)",
+    playersPerTeam: 4,
+    registrationCost: "$35",
+    venue: "Austin, Texas",
+    charity: "Lone Star Juniors",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 84,
+    totalDonations: 8450,
+  },
+  {
+    id: "5",
+    name: "Autumn Masters",
+    status: "completed",
+    startDate: "2025-10-12T10:15:00-04:00",
+    time: "10:15 AM (EST)",
+    playersPerTeam: 4,
+    registrationCost: "$30",
+    venue: "Charlotte, North Carolina",
+    charity: "Greenway Trust",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 88,
+    totalDonations: 10400,
+  },
+  {
+    id: "6",
+    name: "Champions Charity Open",
+    status: "completed",
+    startDate: "2025-09-18T09:00:00-05:00",
+    time: "9:00 AM (CST)",
+    playersPerTeam: 2,
+    registrationCost: "$50",
+    venue: "Chicago, Illinois",
+    charity: "First Tee Chicago",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 64,
+    totalDonations: 15200,
+  },
+  {
+    id: "7",
+    name: "Harbor Links Showdown",
+    status: "upcoming",
+    startDate: "2026-01-15T08:30:00-05:00",
+    time: "8:30 AM (EST)",
+    playersPerTeam: 4,
+    registrationCost: "$40",
+    venue: "Boston, Massachusetts",
+    charity: "Harbor Youth Golf",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 112,
+    totalDonations: 11800,
+  },
+  {
+    id: "8",
+    name: "Palm Grove Classic",
+    status: "active",
+    startDate: "2025-11-28T13:00:00-05:00",
+    time: "1:00 PM (EST)",
+    playersPerTeam: 2,
+    registrationCost: "$35",
+    venue: "Miami, Florida",
+    charity: "Sunshine Golf Initiative",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 54,
+    totalDonations: 6400,
+  },
+  {
+    id: "9",
+    name: "Highland Open",
+    status: "completed",
+    startDate: "2025-08-02T09:45:00-04:00",
+    time: "9:45 AM (EST)",
+    playersPerTeam: 3,
+    registrationCost: "$28",
+    venue: "Asheville, North Carolina",
+    charity: "Mountain Trails Fund",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 63,
+    totalDonations: 7200,
+  },
+  {
+    id: "10",
+    name: "Lakeside Charity Invitational",
+    status: "upcoming",
+    startDate: "2026-02-20T10:15:00-06:00",
+    time: "10:15 AM (CST)",
+    playersPerTeam: 4,
+    registrationCost: "$38",
+    venue: "Brainerd, Minnesota",
+    charity: "North Shore Juniors",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 128,
+    totalDonations: 13450,
+  },
+  {
+    id: "11",
+    name: "River Bend Cup",
+    status: "active",
+    startDate: "2025-11-22T07:45:00-05:00",
+    time: "7:45 AM (EST)",
+    playersPerTeam: 4,
+    registrationCost: "$32",
+    venue: "Richmond, Virginia",
+    charity: "River Bend Youth Golf",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 76,
+    totalDonations: 8900,
+  },
+  {
+    id: "12",
+    name: "Summit Peaks Pro-Am",
+    status: "completed",
+    startDate: "2025-07-11T12:10:00-06:00",
+    time: "12:10 PM (CST)",
+    playersPerTeam: 4,
+    registrationCost: "$55",
+    venue: "Denver, Colorado",
+    charity: "Altitude Sports Fund",
+    image: TOURNAMENT_IMAGE,
+    totalPlayers: 92,
+    totalDonations: 16250,
+  },
 ];
 
-const initialPastRows: TournamentRow[] = [
-  { id: "p1", startDate: "2025-10-18", teamCount: 20, playerCount: 60 },
-  { id: "p2", startDate: "2025-09-01", teamCount: 22, playerCount: 70 },
-  { id: "p3", startDate: "2025-08-15", teamCount: 18, playerCount: 58 },
-];
+const formatDate = (isoDate: string) =>
+  new Date(isoDate).toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
-const statCards = [
-  { id: "teams", label: "Total Teams", value: "32", icon: Users2 },
-  { id: "players", label: "Total Players", value: "100 / 32", icon: UserRound },
+const FILTER_OPTIONS: { label: string; value: TournamentStatus }[] = [
+  { label: "Upcoming", value: "upcoming" },
+  { label: "Active", value: "active" },
+  { label: "Completed", value: "completed" },
 ];
-
-const formatDisplayDate = (isoDate: string) =>
-  new Date(isoDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
 export default function Page() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [activeRows, setActiveRows] = useState(initialActiveRows);
-  const [pastRows] = useState(initialPastRows);
-  const [filter, setFilter] = useState<"active" | "past">("active");
+  const [tournaments, setTournaments] = useState(initialTournaments);
+  const [filter, setFilter] = useState<TournamentStatus>("upcoming");
 
   const headerActions = useMemo(
     () => (
       <Button className="h-11 bg-[#d4d4d4] text-slate-900 hover:bg-[#c4c4c4]" onClick={() => setDialogOpen(true)}>
-        Create New Tournament
+        Create Tournament
       </Button>
     ),
     [setDialogOpen],
   );
 
-  const headerConfig = useMemo(
-    () => ({
-      title: "Tournament",
-      subtitle: "Review upcoming events and manage registrations.",
-      actions: headerActions,
-    }),
-    [headerActions],
+  usePageHeaderConfig(
+    useMemo(
+      () => ({
+        title: "Tournament Dashboard",
+        subtitle: "Track all upcoming, active, and completed events in one place.",
+        actions: headerActions,
+      }),
+      [headerActions],
+    ),
   );
 
-  usePageHeaderConfig(headerConfig);
+  const filteredTournaments = useMemo(
+    () => tournaments.filter((tournament) => tournament.status === filter),
+    [tournaments, filter],
+  );
 
-  const tableRows = useMemo(() => (filter === "active" ? activeRows : pastRows), [activeRows, pastRows, filter]);
+  const summaryMetrics = useMemo(() => {
+    const totalTournaments = tournaments.length;
+    const totalPlayers = tournaments.reduce((sum, tournament) => sum + tournament.totalPlayers, 0);
+    const totalDonations = tournaments.reduce((sum, tournament) => sum + tournament.totalDonations, 0);
+
+    return [
+      { id: "tournaments", label: "Total Tournaments", value: totalTournaments.toString(), icon: Trophy },
+      { id: "players", label: "Total Players", value: totalPlayers.toLocaleString(), icon: Users2 },
+      {
+        id: "donations",
+        label: "Total Donations",
+        value: `$${totalDonations.toLocaleString()}`,
+        icon: DollarSign,
+      },
+    ];
+  }, [tournaments]);
 
   const handleCreate = (values: CreateTournamentFormValues) => {
-    const newRow: TournamentRow = {
+    const createdTournament: TournamentCardData = {
       id: crypto.randomUUID(),
+      name: values.name,
+      status: "upcoming",
       startDate: values.startDate,
-      teamCount: values.teamSize,
-      playerCount: values.teamSize * 4,
+      time: `${values.checkInTime} (EST)`,
+      playersPerTeam: values.teamSize,
+      registrationCost: "$30",
+      venue: values.venue,
+      charity: "Fort Ben Foundation",
+      image: TOURNAMENT_IMAGE,
+      totalPlayers: values.teamSize * 4,
+      totalDonations: 5000,
     };
-    setActiveRows((prev) => [newRow, ...prev]);
-  };
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(highlightTournament.shareLink);
-      toast.success("Link copied to clipboard");
-    } catch {
-      toast.error("Unable to copy link right now");
-    }
+    setTournaments((prev) => [createdTournament, ...prev]);
+    setFilter("upcoming");
   };
 
   return (
     <>
       <div className="flex flex-col gap-8">
-        <section className="flex flex-col gap-4 lg:flex-row">
-          <Card className="flex-1 border border-slate-300 bg-white shadow-sm">
-            <CardContent className="grid gap-6 p-5 lg:grid-cols-[260px_1fr] lg:items-center">
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-slate-200">
-                <Image src={highlightTournament.image} alt={highlightTournament.name} fill className="object-cover" />
-              </div>
-              <div className="flex h-full flex-col gap-6">
-                <div>
-                  <h2 className="text-2xl font-semibold">{highlightTournament.name}</h2>
-                  <p className="text-muted-foreground text-sm">Upcoming featured tournament</p>
+        <section className="grid gap-4 md:grid-cols-3">
+          {summaryMetrics.map((metric) => (
+            <Card key={metric.id} className="border border-slate-200">
+              <CardContent className="flex items-center justify-between gap-4 p-6">
+                <div className="space-y-1">
+                  <p className="text-muted-foreground text-xs uppercase tracking-wide">{metric.label}</p>
+                  <p className="text-3xl font-semibold text-slate-900">{metric.value}</p>
                 </div>
-                <dl className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                    <dt className="text-muted-foreground">Date</dt>
-                    <dd className="font-medium">{highlightTournament.date}</dd>
-                  </div>
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                    <dt className="text-muted-foreground">Time</dt>
-                    <dd className="font-medium">{highlightTournament.time}</dd>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <dt className="text-muted-foreground">Difficulty</dt>
-                    <dd className="font-medium">{highlightTournament.difficulty}</dd>
-                  </div>
-                </dl>
-                <div className="flex flex-wrap gap-3">
-                  <Button
-                    variant="outline"
-                    className="gap-2 border border-slate-300 text-slate-900 hover:bg-[#d4d4d4]"
-                    onClick={handleCopyLink}
-                  >
-                    <Copy className="size-4" />
-                    Copy Link
-                  </Button>
-                  <Button variant="outline" className="gap-2 border border-slate-300 text-slate-900" disabled>
-                    <PencilLine className="size-4" />
-                    Edit
-                  </Button>
+                <div className="flex size-12 items-center justify-center rounded-full bg-[#dedede]">
+                  <metric.icon className="size-6 text-slate-900" />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex w-full flex-col gap-4 lg:w-80">
-            {statCards.map((card) => (
-              <Card key={card.id} className="border border-slate-300 bg-[#e5e5e5]">
-                <CardContent className="flex items-center justify-between gap-3 p-4">
-                  <div>
-                    <p className="text-muted-foreground text-xs tracking-wide uppercase">{card.label}</p>
-                    <p className="mt-1 text-2xl font-semibold text-slate-900">{card.value}</p>
-                  </div>
-                  <card.icon className="size-8 text-slate-700" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+              </CardContent>
+            </Card>
+          ))}
         </section>
 
-        <section className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-xl font-semibold">Tournaments</h2>
-            <div className="flex gap-3">
+        <section className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-slate-900">Tournaments</h2>
+              <p className="text-muted-foreground text-sm">
+                Browse all events and drill into the details when you are ready.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
               <Button
-                variant={filter === "active" ? "default" : "outline"}
-                className={`rounded-full px-6 ${filter === "active" ? "bg-[#d4d4d4] text-slate-900 hover:bg-[#c4c4c4]" : "border-slate-300 text-slate-900"}`}
-                onClick={() => setFilter("active")}
+                variant="outline"
+                className="h-10 gap-2 border border-slate-300 bg-white text-slate-900 hover:bg-[#d4d4d4]"
               >
-                Active Tournaments
+                <Filter className="size-4" />
+                Filter
               </Button>
-              <Button
-                variant={filter === "past" ? "default" : "outline"}
-                className={`rounded-full px-6 ${filter === "past" ? "bg-[#d4d4d4] text-slate-900 hover:bg-[#c4c4c4]" : "border-slate-300 text-slate-900"}`}
-                onClick={() => setFilter("past")}
-              >
-                Past Tournaments
-              </Button>
+              <div className="flex gap-2">
+                {FILTER_OPTIONS.map((option) => {
+                  const isActive = filter === option.value;
+                  return (
+                    <Button
+                      key={option.value}
+                      variant="outline"
+                      className={`h-10 rounded-full px-6 text-sm ${
+                        isActive
+                          ? "border-slate-900 bg-[#d4d4d4] text-slate-900 hover:bg-[#c4c4c4]"
+                          : "border-slate-300 text-slate-900 hover:bg-[#ededed]"
+                      }`}
+                      onClick={() => setFilter(option.value)}
+                    >
+                      {option.label}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <Card className="border border-slate-300">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>No of Total Team</TableHead>
-                    <TableHead>No of Total Player</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tableRows.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell>{formatDisplayDate(row.startDate)}</TableCell>
-                      <TableCell>{row.teamCount}</TableCell>
-                      <TableCell>{row.playerCount}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {filteredTournaments.map((tournament) => (
+              <Card key={tournament.id} className="border border-slate-200">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+                  <Image src={tournament.image} alt={tournament.name} fill className="object-cover" />
+                </div>
+                <CardContent className="space-y-6 p-6">
+                  <div>
+                    <h3 className="text-xl font-semibold text-slate-900">{tournament.name}</h3>
+                  </div>
+                  <dl className="grid grid-cols-1 gap-3 text-sm text-slate-900 md:grid-cols-2">
+                    {[
+                      { label: "Date", value: formatDate(tournament.startDate), icon: CalendarDays },
+                      { label: "Time", value: tournament.time, icon: Clock },
+                      { label: "Players per team", value: tournament.playersPerTeam, icon: Users },
+                      { label: "Registration Cost", value: tournament.registrationCost, icon: DollarSign },
+                      { label: "Venue", value: tournament.venue, icon: MapPin },
+                      { label: "Benefiting Charity", value: tournament.charity, icon: HeartHandshake },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-start gap-3">
+                        <div className="mt-0.5 flex size-9 items-center justify-center rounded-full bg-[#ededed]">
+                          <item.icon className="size-4 text-slate-900" />
+                        </div>
+                        <div className="space-y-1">
+                          <dt className="text-muted-foreground text-xs uppercase">{item.label}</dt>
+                          <dd className="text-sm font-medium leading-none text-slate-900">{item.value}</dd>
+                        </div>
+                      </div>
+                    ))}
+                  </dl>
+                  <Button className="w-full bg-[#d4d4d4] text-slate-900 hover:bg-[#c4c4c4]">View Details</Button>
+                </CardContent>
+              </Card>
+            ))}
+
+            {filteredTournaments.length === 0 && (
+              <Card className="border border-dashed border-slate-300 bg-white">
+                <CardContent className="flex h-full flex-col items-center justify-center gap-3 p-10 text-center">
+                  <p className="text-lg font-semibold text-slate-900">No tournaments yet</p>
+                  <p className="text-muted-foreground text-sm">
+                    Switch filters or create a tournament to get the ball rolling.
+                  </p>
+                  <Button
+                    className="bg-[#d4d4d4] text-slate-900 hover:bg-[#c4c4c4]"
+                    onClick={() => setDialogOpen(true)}
+                  >
+                    Create Tournament
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </section>
       </div>
       <CreateTournamentDialog open={dialogOpen} onOpenChange={setDialogOpen} onCreate={handleCreate} />

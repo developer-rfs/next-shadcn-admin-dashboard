@@ -17,6 +17,7 @@ type RegisterPayload = {
   password: string;
   contact_number: string;
   full_name: string;
+  organization: string;
 };
 
 type VerifyOtpPayload = {

@@ -20,6 +20,7 @@ const PHONE_REGEX = /^\+?[0-9]{6,15}$/;
 const FormSchema = z
   .object({
     full_name: z.string().min(2, { message: "Please enter your full name." }),
+    organization: z.string().min(2, { message: "Please enter your organization name." }),
     contact_number: z
       .string()
       .min(6, { message: "Enter a valid contact number." })
@@ -42,6 +43,9 @@ const sanitizeContactNumber = (value: string) => {
   return (hasPlus ? "+" : "") + limitedDigits;
 };
 
+const inputStyles =
+  "h-12 rounded-none border-slate-900/50 shadow-none focus-visible:border-slate-900 focus-visible:ring-0";
+
 export function RegisterForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,6 +56,7 @@ export function RegisterForm() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       full_name: "",
+      organization: "",
       contact_number: "",
       email: "",
       password: "",
@@ -64,6 +69,7 @@ export function RegisterForm() {
     try {
       await registerUser({
         full_name: data.full_name,
+        organization: data.organization,
         contact_number: data.contact_number,
         email: data.email,
         password: data.password,
@@ -97,7 +103,7 @@ export function RegisterForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="full_name"
@@ -105,7 +111,13 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input id="full_name" placeholder="Jane Doe" autoComplete="name" {...field} />
+                <Input
+                  id="full_name"
+                  placeholder="Enter your full name"
+                  autoComplete="name"
+                  className={inputStyles}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -116,14 +128,15 @@ export function RegisterForm() {
           name="contact_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contact Number</FormLabel>
+              <FormLabel>Mobile</FormLabel>
               <FormControl>
                 <Input
                   id="contact_number"
                   type="tel"
-                  placeholder="+1 000 000 0000"
+                  placeholder="Enter your mobile"
                   autoComplete="tel"
                   maxLength={16}
+                  className={inputStyles}
                   value={field.value}
                   onChange={(event) => field.onChange(sanitizeContactNumber(event.target.value))}
                 />
@@ -137,9 +150,35 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...field} />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                  className={inputStyles}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="organization"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Organization</FormLabel>
+              <FormControl>
+                <Input
+                  id="organization"
+                  placeholder="Enter name"
+                  autoComplete="organization"
+                  className={inputStyles}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -156,8 +195,9 @@ export function RegisterForm() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="********"
+                    placeholder="Create a password"
                     autoComplete="new-password"
+                    className={inputStyles}
                     {...field}
                   />
                   <button
@@ -185,8 +225,9 @@ export function RegisterForm() {
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="********"
+                    placeholder="Re-enter password"
                     autoComplete="new-password"
+                    className={inputStyles}
                     {...field}
                   />
                   <button
@@ -204,11 +245,11 @@ export function RegisterForm() {
           )}
         />
         <Button
-          className="w-full bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-70"
+          className="w-full bg-[#D9D9D9] text-slate-900 hover:bg-[#c5c5c5] focus-visible:ring-0 disabled:opacity-70"
           type="submit"
           disabled={isSubmitting}
         >
-          Register
+          Next
         </Button>
       </form>
     </Form>

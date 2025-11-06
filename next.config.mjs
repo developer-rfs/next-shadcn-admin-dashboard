@@ -5,7 +5,12 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
   images: {
-    domains: ["ddf-backend-static.s3.amazonaws.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ddf-backend-static.s3.amazonaws.com",
+      },
+    ],
   },
   async redirects() {
     return [
